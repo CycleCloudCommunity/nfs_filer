@@ -1,0 +1,178 @@
+################################
+## NFS Server Template ##
+################################
+[parameters General Settings]
+Order = 10
+
+    [[parameters Cloud Service Provider Configuration]]
+    Description = Configure the Cloud Provider account options.
+    Order = 10
+
+        [[[parameter CloudProvider]]]
+        Label = Cloud Provider
+        ParameterType = Cloud.Provider
+	DefaultValue = azure
+	Hidden = true
+
+        [[[parameter Credentials]]]
+        Description = The credentials for the cloud provider
+        ParameterType = Cloud.Credentials
+
+        [[[parameter Region]]]
+        Label = Region
+        Description = Deployment Location
+        ParameterType = Cloud.Region
+	DefaultValue = westus2
+
+        [[[parameter KeyPairLocation]]]
+        Label = Keypair Path
+        Description = The path to the private SSH key to use for the `cyclecloud` user on the nodes.
+        DefaultValue = /opt/cycle_server/.ssh/cyclecloud.pem
+        Required = True
+
+        [[[parameter ImageName]]]
+        Label = Base OS
+        ParameterType = Cloud.Image
+        Config.OS = linux
+        DefaultValue = cycle.image.centos7
+
+        [[[parameter MachineType]]]
+        Label = NFS Machine Type
+        Description = The machine type for the NFS Server host
+        ParameterType = Cloud.MachineType
+	DefaultValue = Standard_DS4_v2
+
+        [[[parameter AdditionalClusterInitSpecs]]]
+        Label = Cluster-Init Specs
+        Description = Cluster init specs to apply to the NFS Server host
+        ParameterType = Cloud.ClusterInitSpecs
+
+    [[parameters Filesystem Configuration]]
+
+        [[[parameter FsConfigDesc]]]
+        HideLabel = true
+        Config.Plugin = pico.widget.HtmlTemplateWidget
+        Config.Template = "Configure the Filesystem options."
+
+        [[[parameter FilesystemSize]]]
+        Label = Size (GB)
+        Description = The filesystem size
+        DefaultValue = 100
+        Config.Plugin = pico.form.NumberTextBox
+        Config.MinValue = 10
+        Config.MaxValue = 10240
+        Config.IntegerOnly = true
+
+        [[[parameter FileSystemType]]]
+        Label = Format
+        DefaultValue = xfs
+        Config.Plugin = pico.form.Dropdown
+            [[[[list Config.Entries]]]]
+                Name = xfs
+                Label = xfs
+            [[[[list Config.Entries]]]]
+                Name = ext3
+                Label = ext3
+            [[[[list Config.Entries]]]]
+                Name = ext4
+                Label = ext4
+
+        [[[parameter FileSystemPersistence]]]
+            Label = Filesystem Persistence
+            DefaultValue = ephemeral
+            Config.Plugin = pico.form.RadioButtonsControl
+            [[[[list Config.Entries]]]]
+                Name = false
+                Label = Ephemeral
+            [[[[list Config.Entries]]]]
+                Name = true
+                Label = Persistent
+
+    [[parameters Azure Virtual Network Configuration]]
+    Order = 40
+
+        [[[parameter ReturnProxy]]]
+        Label = Return Proxy
+        DefaultValue = true
+        Widget.Plugin = pico.form.BooleanCheckBox
+        Widget.Label = Allow cloud instances to report back their state
+
+        [[[parameter AssignPublicIp]]]
+        Label = Assign Public IP
+        DefaultValue = true
+        Widget.Plugin = pico.form.BooleanCheckBox
+        Widget.Label = Assign a public ip address to the nfs server node?
+
+
+        [[[parameter SubnetId]]]
+        Label = Subnet ID
+        Description = Subnet Resource Path (ResourceGroup/VirtualNetwork/Subnet)
+        ParameterType = Azure.Subnet
+
+
+[cluster nfs]
+IconUrl = http://download.cyclecomputing.com/logos/nfs-192x192.png
+Category = File Systems
+
+    [[node defaults]]
+
+    Credentials = $Credentials    
+
+    ImageName = $ImageName
+    SubnetId = $SubnetId
+    Region = $Region
+
+    KeyPairLocation = $KeyPairLocation
+
+	# Ensure consistent UID and GID between Filer and mounting clusters
+	[[[configuration]]]
+	cyclecloud.cluster.user.uid = 56696
+	cyclecloud.cluster.user.gid = 56696    
+
+    ## The standalone Shared Filer
+    [[node filer]]
+    MachineType = $MachineType
+    IsReturnProxy = true
+
+    AdditionalClusterInitSpecs = $AdditionalClusterInitSpecs
+
+
+	[[[configuration]]]
+	run_list = recipe[cganglia::server], recipe[cganglia::client]
+	
+	cyclecloud.discoverable = true
+	role = sharedfs
+
+	[[[volume nfs-vol1]]]
+	Size = $FilesystemSize
+	SSD = True
+	Mount = nfs
+	Persistent = $FileSystemPersistence
+
+	[[[configuration cyclecloud.mounts.nfs]]]
+	mountpoint = /mnt/exports
+	fs_type = $FileSystemType
+	raid_level = 0
+
+	[[[configuration cyclecloud.exports.shared]]]
+	disabled = true
+	
+	[[[configuration cyclecloud.exports.sched]]]
+	disabled = true
+	
+	[[[configuration cyclecloud.exports.nfs_data]]]
+	type = nfs
+	export_path = /mnt/exports/data
+      
+        # Configure network access to additional Azure external input endpoints
+        [[[input-endpoint SSH]]]
+        PrivatePort = 22
+        PublicPort = 22
+
+        [[[input-endpoint ganglia]]]
+        PrivatePort = 8652
+        PublicPort = 8652        
+
+        [[[network-interface eth0]]]
+        AssociatePublicIpAddress = $AssignPublicIp
+
