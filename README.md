@@ -2,6 +2,17 @@
 
 This project installs and configures a simple standalone NFS filesystem which may be mounted by other clusters.
 
+The NFS server created in this sample has a single storage volume, exported at `/mnt/exports/data`.   For real
+file server deployments, a wide variety of options are supported.
+
+See the CycleCloud documentation for the full set of options for mounting and raiding volumes on the server, and configuring NFS exports and mounts:
+
+- How to mount persistent storage volumes:
+    - [Mounting Volumes](https://docs.cyclecomputing.com/user-guide-v6.6.1/storage/_mounting_volumes)
+- How to create an NFS export and mount it:
+    - [Exporting and Mounting NFS](https://docs.cyclecomputing.com/user-guide-v6.6.1/storage/_mounting_nfs)
+
+
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-generate-toc again -->
 **Table of Contents**
 
