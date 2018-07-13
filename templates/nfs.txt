@@ -20,7 +20,7 @@ Category = File Systems
 
     [[node filer]]
     MachineType = $MachineType
-    IsReturnProxy = true
+    IsReturnProxy = $ReturnProxy
 
     AdditionalClusterInitSpecs = $FileServerClusterInitSpecs
 
