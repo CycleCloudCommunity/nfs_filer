@@ -17,10 +17,6 @@ Category = File Systems
 
     KeyPairLocation = $KeyPairLocation
 
-       [[[configuration]]]
-       cyclecloud.cluster.user.uid = 56696
-       cyclecloud.cluster.user.gid = 56696    
-
 
     [[node filer]]
     MachineType = $MachineType
@@ -56,6 +52,8 @@ Category = File Systems
        type = nfs
        export_path = /mnt/exports/data
       
+       [[[cluster-init cyclecloud/nfs:default:1.0.0]]]
+        
        [[[input-endpoint ganglia]]]
        PrivatePort = 8652
        PublicPort = 8652        
