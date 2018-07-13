@@ -21,7 +21,7 @@ Category = File Systems
        cyclecloud.cluster.user.uid = 56696
        cyclecloud.cluster.user.gid = 56696    
 
-    ## The standalone Shared Filer
+
     [[node filer]]
     MachineType = $MachineType
     IsReturnProxy = true
@@ -56,12 +56,12 @@ Category = File Systems
        type = nfs
        export_path = /mnt/exports/data
       
-        [[[input-endpoint ganglia]]]
-        PrivatePort = 8652
-        PublicPort = 8652        
+       [[[input-endpoint ganglia]]]
+       PrivatePort = 8652
+       PublicPort = 8652        
 
-        [[[network-interface eth0]]]
-        AssociatePublicIpAddress = $UsePublicNetwork
+       [[[network-interface eth0]]]
+       AssociatePublicIpAddress = $UsePublicNetwork
 
 
 
@@ -74,7 +74,7 @@ Order = 1
         [[[parameter Filer]]]
         HideLabel = true
         Config.Plugin = pico.widget.HtmlTemplateWidget
-        Config.Template := "<table><tr><td><img src='https://github.com/CycleCloudCommunity/nfs_filer/raw/master/logo.png' width='192' height='192'></td></tr><tr><td><p>Creates a basic, single-node NFS File Server exporting a configurable directory.  This file server may be mounted by other clusters as a cluster-local, persistent, shared storage device.</p></td></tr></table>"
+        Config.Template := "<table><tr><td><img src='https://github.com/CycleCloudCommunity/nfs_filer/raw/master/icon.png' width='192' height='192'></td></tr><tr><td><p>Creates a basic, single-node NFS File Server exporting a configurable directory.  This file server may be mounted by other clusters as a cluster-local, persistent, shared storage device.</p></td></tr></table>"
 
         [[[parameter Readme]]]
         HideLabel = true
@@ -110,6 +110,7 @@ Order = 10
         Label = Subnet ID
         Description = Subnet Resource Path (ResourceGroup/VirtualNetwork/Subnet)
         ParameterType = Azure.Subnet
+        Required = True
 
 
 [parameters Advanced Settings]
