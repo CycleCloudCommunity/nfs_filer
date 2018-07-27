@@ -9,13 +9,11 @@ Category = Infrastructure
     [[node defaults]]
 
     Credentials = $Credentials    
-
     ImageName = $ImageName
     SubnetId = $SubnetId
     Region = $Region
-
-    KeyPairLocation = $KeyPairLocation
-
+    KeyPairLocation = ~/.ssh/cyclecloud.pem
+    UsePublicNetwork = $UsePublicNetwork
 
     [[node filer]]
     MachineType = $MachineType
@@ -182,7 +180,7 @@ Order = 20
 
         [[[parameter ReturnProxy]]]
         Label = Return Proxy
-        DefaultValue = false
+        DefaultValue = true
         ParameterType = Boolean
         Config.Label = Use SSH tunnel to connect to CycleCloud (required if direct access is blocked)
 
@@ -191,10 +189,4 @@ Order = 20
         DefaultValue = true
         ParameterType = Boolean
         Config.Label = Access master node from the Internet
-
-        [[[parameter KeyPairLocation]]]
-        Label = Keypair Path
-        Description = The path to the private SSH key to use for the `cyclecloud` user on linux nodes.
-        DefaultValue = ~/.ssh/cyclecloud.pem
-        Required = True
 
