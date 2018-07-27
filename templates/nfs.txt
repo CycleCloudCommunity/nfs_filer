@@ -4,8 +4,7 @@
 
 [cluster nfs]
 FormLayout = selectionpanel
-IconUrl = https://github.com/CycleCloudCommunity/nfs_filer/raw/master/icon.png
-Category = File Systems
+Category = Infrastructure
 
     [[node defaults]]
 
